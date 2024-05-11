@@ -1,0 +1,23 @@
+Per extreure les dades, he utilitzat dues comandes de "mysqldump", els quals explicaré a continuació.
+
+Per extreure les taules sense cap tipus de dada, és a dir, l'estructura de la base de dades cal ficar:
+
+mysqldump -u root -p --no-data --skip-triggers --no-create-db --skip-opt (nom de la base de dades) > (ruta a on guardar acabate en ".sql")
+
+L'execució de la comanda va a ser aquesta:
+
+usuari@debian12:~$ mysqldump -u root -p --no-data --skip-triggers --no-create-db --skip-opt movies > ~/sql/movies-taules-dump.sql
+Enter password:
+
+He deixat la part d'enter password perquè ens ho demana per entrar al nostre client de MySQL.
+
+Ara bé, per extreure només les dades, tomem com a base aquesta comanda: 
+
+mysqldump -u root -p --no-create-info --no-create-db (nom de la base de dades) > (ruta a on guardar acabate en ".sql")
+
+I fiquem la comanda, al igual que abans, fora del nostre client de MySQL:
+
+usuari@debian12:~$ mysqldump -u root -p --no-create-info --no-create-db movies > ~/sql/movies-dades-dump.sql
+Enter password: 
+
+I també hem de ficar la contrasenya per poder extreure l'arxiu.
