@@ -1,0 +1,453 @@
+M02UF2-A9
+
+ACTIVITAT A:
+
+L'arxiu SQL és troba penjat.
+
+ACTIVITAT B:
+
+Els inserts també és troben penjat a dins d'un arxiu. Els selects de comprovació els faig en l'apartat C. Per aquest apartat, faig el DESC de cada taula. Abans de res, aquí són les taules:
+
+mysql:[root:habitatge]> SHOW TABLES;
++---------------------+
+| Tables_in_habitatge |
++---------------------+
+| característiques    |
+| casa                |
+| comarques           |
+| energia             |
+| habitatge_municipi  |
+| habitatges_general  |
+| municipis           |
+| pis                 |
+| provincies          |
++---------------------+
+9 rows in set (0,00 sec)
+
+En aquesta taula he recollit tots els detalls que pot tenir una casa dels dos arxius CSV. Aquestes coses són universals ja que ho poden tenir tant una casa com un pis.
+
+mysql:[root:habitatge]> DESC característiques;
++------------------+------------+------+-----+---------+-------+
+| Field            | Type       | Null | Key | Default | Extra |
++------------------+------------+------+-----+---------+-------+
+| id_habitatge     | int        | YES  | MUL | NULL    |       |
+| aire_condicionat | tinyint(1) | YES  |     | NULL    |       |
+| ascensor         | tinyint(1) | YES  |     | NULL    |       |
+| calefacció       | tinyint(1) | YES  |     | NULL    |       |
+| mobles           | tinyint(1) | YES  |     | NULL    |       |
+| parquing         | tinyint(1) | YES  |     | NULL    |       |
+| piscina          | tinyint(1) | YES  |     | NULL    |       |
+| traster          | tinyint(1) | YES  |     | NULL    |       |
+| ximenea          | tinyint(1) | YES  |     | NULL    |       |
++------------------+------------+------+-----+---------+-------+
+9 rows in set (0,00 sec)
+
+En "casa" fico les característiques exclusives que tenen les cases: com tenir garatge o jardí. A més, he aprofitat per clasificar el tipus de casa. Per una millor organització, he assignat un valor autoincremental a un atribut anomenat "id_casa", que fa distinguir el que és una casa d'un pis.
+
+mysql:[root:habitatge]> DESC casa;
++---------------------+---------------------------------------------------------------+------+-----+---------+----------------+
+| Field               | Type                                                          | Null | Key | Default | Extra          |
++---------------------+---------------------------------------------------------------+------+-----+---------+----------------+
+| id_casa             | int                                                           | NO   | PRI | NULL    | auto_increment |
+| id_habitatge        | int                                                           | YES  | MUL | NULL    |                |
+| tipus_casa          | enum('Aïllada','Adosada','Finca rústica','Masia','Castell')   | YES  |     | NULL    |                |
+| superfície_garatge  | decimal(10,2)                                                 | YES  |     | NULL    |                |
+| superfície_jardí    | decimal(10,2)                                                 | YES  |     | NULL    |                |
++---------------------+---------------------------------------------------------------+------+-----+---------+----------------+
+5 rows in set (0,00 sec)
+
+No hi ha molt que explicar: només indica el nom de la comarca i el seu codi segons un dels CSV. Hi han molts NULLs ja que són de llocs que no hi eren Catalunya i així estava el CSV.
+
+mysql:[root:habitatge]> DESC comarques;
++--------------+----------+------+-----+---------+-------+
+| Field        | Type     | Null | Key | Default | Extra |
++--------------+----------+------+-----+---------+-------+
+| codi_comarca | int      | NO   | PRI | NULL    |       |
+| nom_comarca  | char(50) | YES  |     | NULL    |       |
++--------------+----------+------+-----+---------+-------+
+2 rows in set (0,00 sec)
+
+Vaig veure que l'enunciat fa molt enfasí a les coses relacionades amb l'energia, he creat aquesta taula que recull tot el que té a veure, juntament al id_habitatge per saber de quina casa estem parlant.
+
+mysql:[root:habitatge]> DESC energia;
++------------------------+-----------------------------------+------+-----+---------+-------+
+| Field                  | Type                              | Null | Key | Default | Extra |
++------------------------+-----------------------------------+------+-----+---------+-------+
+| id_habitatge           | int                               | YES  | MUL | NULL    |       |
+| certificat_energètic   | enum('A','B','C','D','E','F','G') | YES  |     | NULL    |       |
+| consum_energètic       | decimal(10,2)                     | YES  |     | NULL    |       |
+| emissons_energètiques  | decimal(10,2)                     | YES  |     | NULL    |       |
++------------------------+-----------------------------------+------+-----+---------+-------+
+4 rows in set (0,00 sec)
+
+Aquesta taula em relaciona els habitatges amb els municipis. Ja que els habitatges amb la situació són molt independents i aquesta va ser la meva forma d'unir-los.
+
+mysql:[root:habitatge]> DESC habitatge_municipi;
++---------------+------+------+-----+---------+-------+
+| Field         | Type | Null | Key | Default | Extra |
++---------------+------+------+-----+---------+-------+
+| id_habitatge  | int  | YES  | MUL | NULL    |       |
+| codi_municipi | int  | YES  | MUL | NULL    |       |
++---------------+------+------+-----+---------+-------+
+2 rows in set (0,00 sec)
+
+És la taula central de la meva base de dades, i la clau primària "id_habitatge" és la que utilitzaré per quasitotes les altres taules.
+
+mysql:[root:habitatge]> DESC habitatges_general;
++------------------------+---------------+------+-----+-------------------+-------------------+
+| Field                  | Type          | Null | Key | Default           | Extra             |
++------------------------+---------------+------+-----+-------------------+-------------------+
+| id_habitatge           | int           | NO   | PRI | NULL              |                   |
+| numero_plantes         | int           | YES  |     | NULL              |                   |
+| nombre_dormitoris      | int           | YES  |     | NULL              |                   |
+| nombre_banys           | int           | YES  |     | NULL              |                   |
+| superfície_habitatge   | decimal(10,2) | YES  |     | NULL              |                   |
+| superfície_terrasa     | decimal(10,2) | YES  |     | NULL              |                   |
+| any_construcció        | year          | YES  |     | NULL              |                   |
+| estat_conservacio      | char(30)      | YES  |     | NULL              |                   |
+| preu_venda             | decimal(10,2) | YES  |     | NULL              |                   |
+| disponibilitat_lloguer | tinyint(1)    | YES  |     | NULL              |                   |
+| descripció             | varchar(140)  | YES  |     | NULL              |                   |
+| data_actualizació      | timestamp     | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++------------------------+---------------+------+-----+-------------------+-------------------+
+12 rows in set (0,00 sec)
+
+El municipi té una funció de recopilar gran part de la informació del CSV. Amb taules temporals, vaig poder implementar gran part de la informació.
+
+mysql:[root:habitatge]> DESC municipis;
++----------------+---------------+------+-----+---------+-------+
+| Field          | Type          | Null | Key | Default | Extra |
++----------------+---------------+------+-----+---------+-------+
+| codi_municipi  | int           | NO   | PRI | NULL    |       |
+| nom_municipi   | char(50)      | YES  |     | NULL    |       |
+| codi_provincia | int           | YES  | MUL | NULL    |       |
+| codi_ine       | int           | YES  |     | NULL    |       |
+| latitud        | decimal(10,8) | YES  |     | NULL    |       |
+| longitud       | decimal(10,8) | YES  |     | NULL    |       |
+| UTM_X          | int           | YES  |     | NULL    |       |
+| UTM_Y          | int           | YES  |     | NULL    |       |
+| point          | varchar(50)   | YES  |     | NULL    |       |
++----------------+---------------+------+-----+---------+-------+
+9 rows in set (0,00 sec)
+
+És similar a la taula de casa, però més bàsica ja que només té els identificadors i el tipus de casa.
+
+mysql:[root:habitatge]> DESC pis;
++--------------+-----------------------------------------+------+-----+---------+----------------+
+| Field        | Type                                    | Null | Key | Default | Extra          |
++--------------+-----------------------------------------+------+-----+---------+----------------+
+| id_pis       | int                                     | NO   | PRI | NULL    | auto_increment |
+| id_habitatge | int                                     | YES  | MUL | NULL    |                |
+| tipus_pis    | enum('Àtic','Dúplex','Estudi','Loft')   | YES  |     | NULL    |                |
++--------------+-----------------------------------------+------+-----+---------+----------------+
+3 rows in set (0,00 sec)
+
+Per acabar amb aquesta part, les provincies estàn a dins de les comarques i els municipis dins de les provincies. És a dir, és la taula que relaciona tot allò que té veure amb la geografia de la regió.
+
+mysql:[root:habitatge]> DESC provincies;
++----------------+-------------+------+-----+---------+-------+
+| Field          | Type        | Null | Key | Default | Extra |
++----------------+-------------+------+-----+---------+-------+
+| codi_provincia | int         | NO   | PRI | NULL    |       |
+| nom_provincia  | varchar(50) | YES  |     | NULL    |       |
+| codi_comarca   | int         | YES  | MUL | NULL    |       |
++----------------+-------------+------+-----+---------+-------+
+3 rows in set (0,01 sec)
+
+ACTIVITAT C:
+
+mysql:[root:habitatge]> SELECT * FROM característiques LIMIT 5;
++--------------+------------------+----------+-------------+--------+----------+---------+---------+---------+
+| id_habitatge | aire_condicionat | ascensor | calefacció  | mobles | parquing | piscina | traster | ximenea |
++--------------+------------------+----------+-------------+--------+----------+---------+---------+---------+
+|     84689154 |                0 |        0 |           0 |      1 |        0 |       0 |       0 |       0 |
+|     81252831 |                0 |        0 |           0 |      1 |        0 |       0 |       1 |       1 |
+|      1941720 |                1 |        0 |           0 |      0 |        0 |       0 |       1 |       0 |
+|     37945359 |                1 |        1 |           0 |      0 |        0 |       0 |       0 |       0 |
+|     29190654 |                0 |        0 |           0 |      0 |        0 |       0 |       1 |       0 |
++--------------+------------------+----------+-------------+--------+----------+---------+---------+---------+
+5 rows in set (0,00 sec)
+
+mysql:[root:habitatge]> SELECT * FROM casa LIMIT 5;
++---------+--------------+------------+---------------------+--------------------+
+| id_casa | id_habitatge | tipus_casa | superfície_garatge  | superfície_jardí   |
++---------+--------------+------------+---------------------+--------------------+
+|       1 |     81252831 | Aïllada    |               35.10 |              70.20 |
+|       2 |      1941720 | Masia      |               40.10 |              80.20 |
+|       3 |     29190654 | Adosada    |              220.00 |             440.00 |
+|       4 |     82091122 | Aïllada    |               48.00 |              96.00 |
+|       5 |     82125040 | Masia      |               75.00 |             150.00 |
++---------+--------------+------------+---------------------+--------------------+
+5 rows in set (0,00 sec)
+
+mysql:[root:habitatge]> SELECT * FROM comarques LIMIT 5;
++--------------+--------------+
+| codi_comarca | nom_comarca  |
++--------------+--------------+
+|            0 | NULL         |
+|            1 | Alt Camp     |
+|            2 | Alt Empordà  |
+|            3 | Alt Penedès  |
+|            4 | Alt Urgell   |
++--------------+--------------+
+5 rows in set (0,00 sec)
+
+mysql:[root:habitatge]> SELECT * FROM energia LIMIT 5;
++--------------+-----------------------+-------------------+------------------------+
+| id_habitatge | certificat_energètic  | consum_energètic  | emissons_energètiques  |
++--------------+-----------------------+-------------------+------------------------+
+|     84689154 | E                     |            135.00 |                 296.00 |
+|     81252831 | D                     |            975.00 |                 112.00 |
+|      1941720 | B                     |            316.00 |                 494.00 |
+|     37945359 | G                     |            991.00 |                 490.00 |
+|     29190654 | G                     |            708.00 |                 375.00 |
++--------------+-----------------------+-------------------+------------------------+
+5 rows in set (0,00 sec)
+
+mysql:[root:habitatge]> SELECT * FROM habitatge_municipi LIMIT 5;
++--------------+---------------+
+| id_habitatge | codi_municipi |
++--------------+---------------+
+|     84779549 |           137 |
+|     84257962 |           137 |
+|     82977638 |           137 |
+|     38713854 |           137 |
+|     81783958 |           137 |
++--------------+---------------+
+5 rows in set (0,00 sec)
+
+
+Tot i què l'enunciat demana "SELECT *", per la columna "descripció" no es veu bé la taula "habitatges_generals". Per això mateix et deixo dos selects, la consulta tal i com hauria de ser (el "SELECT *") i la consulta sense la columna "descripció":
+
+
+mysql:[root:habitatge]> SELECT id_habitatge, numero_plantes, nombre_dormitoris, nombre_banys, superfície_habitatge, superfície_terrasa, any_construcció, estat_conservacio, preu_venda, disponibilitat_lloguer, data_actualizació FROM habitatges_general LIMIT 5;
++--------------+----------------+-------------------+--------------+-----------------------+---------------------+------------------+--------------------------+------------+------------------------+---------------------+
+| id_habitatge | numero_plantes | nombre_dormitoris | nombre_banys | superfície_habitatge  | superfície_terrasa  | any_construcció  | estat_conservacio        | preu_venda | disponibilitat_lloguer | data_actualizació   |
++--------------+----------------+-------------------+--------------+-----------------------+---------------------+------------------+--------------------------+------------+------------------------+---------------------+
+|       310988 |              1 |                 2 |            1 |                118.00 |               11.80 |             2021 | segunda mano/buen estado |  170000.00 |                      0 | 2024-04-17 23:21:59 |
+|       321374 |              3 |                 4 |            3 |                660.00 |               66.00 |             1991 | segunda mano/buen estado |  300000.00 |                      0 | 2024-04-17 23:21:59 |
+|       334861 |              0 |                 4 |            2 |                480.00 |               48.00 |             1980 | segunda mano/buen estado |  475000.00 |                      1 | 2024-04-17 23:21:58 |
+|       338235 |              3 |                 3 |            1 |                 80.00 |                8.00 |             1981 | segunda mano/buen estado |  190000.00 |                      0 | 2024-04-17 23:21:59 |
+|       338583 |              0 |                 2 |            2 |                 71.00 |                7.10 |             1990 | segunda mano/buen estado |  152000.00 |                      0 | 2024-04-17 23:21:59 |
++--------------+----------------+-------------------+--------------+-----------------------+---------------------+------------------+--------------------------+------------+------------------------+---------------------+
+5 rows in set (0,00 sec)
+
+mysql:[root:habitatge]> SELECT * FROM habitatges_general LIMIT 5;
++--------------+----------------+-------------------+--------------+-----------------------+---------------------+------------------+--------------------------+------------+------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+
+| id_habitatge | numero_plantes | nombre_dormitoris | nombre_banys | superfície_habitatge  | superfície_terrasa  | any_construcció  | estat_conservacio        | preu_venda | disponibilitat_lloguer | descripció                                                                                                                                      | data_actualizació   |
++--------------+----------------+-------------------+--------------+-----------------------+---------------------+------------------+--------------------------+------------+------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+
+|       310988 |              1 |                 2 |            1 |                118.00 |               11.80 |             2021 | segunda mano/buen estado |  170000.00 |                      0 | vistas a la montaña y situado a 5 minutos de las pistas de esquí. precio negociable, distribución:, terraza descubierta de 18 m2, la casa di    | 2024-04-17 23:21:59 |
+|       321374 |              3 |                 4 |            3 |                660.00 |               66.00 |             1991 | segunda mano/buen estado |  300000.00 |                      0 | casa de 600 metros planta baja local comercial, 2º planta almacén, 3º planta vivienda de unos 130 metros, garaje en sótano.                     | 2024-04-17 23:21:59 |
+|       334861 |              0 |                 4 |            2 |                480.00 |               48.00 |             1980 | segunda mano/buen estado |  475000.00 |                      1 |                                                                                                                                                 | 2024-04-17 23:21:58 |
+|       338235 |              3 |                 3 |            1 |                 80.00 |                8.00 |             1981 | segunda mano/buen estado |  190000.00 |                      0 | se vende o alquila 550? todo el piso esta recién reformado las paredes del baño es de porcelanico el espejo incrustado a la pared plato de d    | 2024-04-17 23:21:59 |
+|       338583 |              0 |                 2 |            2 |                 71.00 |                7.10 |             1990 | segunda mano/buen estado |  152000.00 |                      0 | De particular a particular (abstenerse agencias), magnífico apartamento de 71 m2 completamente amueblado, con bomba de calor y con electrodo    | 2024-04-17 23:21:59 |
++--------------+----------------+-------------------+--------------+-----------------------+---------------------+------------------+--------------------------+------------+------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+
+5 rows in set (0,00 sec)
+
+mysql:[root:habitatge]> SELECT * FROM municipis LIMIT 5;
++---------------+-------------------+----------------+----------+------------+------------+-------+-------+-------+
+| codi_municipi | nom_municipi      | codi_provincia | codi_ine | latitud    | longitud   | UTM_X | UTM_Y | point |
++---------------+-------------------+----------------+----------+------------+------------+-------+-------+-------+
+|            10 | Abla              |              4 |     1004 | 0.00000000 | 0.00000000 |     0 |     0 | NULL  |
+|            11 | Abajas            |              9 |     1109 | 0.00000000 | 0.00000000 |     0 |     0 | NULL  |
+|            12 | Alaró             |              7 |     1207 | 0.00000000 | 0.00000000 |     0 |     0 | NULL  |
+|            13 | Adanero           |              5 |     1305 | 0.00000000 | 0.00000000 |     0 |     0 | NULL  |
+|            14 | Alegría-Dulantzi  |              1 |     1401 | 0.00000000 | 0.00000000 |     0 |     0 | NULL  |
++---------------+-------------------+----------------+----------+------------+------------+-------+-------+-------+
+5 rows in set (0,00 sec)
+
+mysql:[root:habitatge]> SELECT * FROM pis LIMIT 5;
++--------+--------------+-----------+
+| id_pis | id_habitatge | tipus_pis |
++--------+--------------+-----------+
+|      1 |     84689154 | Loft      |
+|      2 |     37945359 | Estudi    |
+|      3 |     37608772 | Dúplex    |
+|      4 |     81235808 | Estudi    |
+|      5 |     35879258 | Àtic      |
++--------+--------------+-----------+
+5 rows in set (0,00 sec)
+
+mysql:[root:habitatge]> SELECT * FROM provincies LIMIT 5;
++----------------+---------------+--------------+
+| codi_provincia | nom_provincia | codi_comarca |
++----------------+---------------+--------------+
+|              1 | Àlaba         |            0 |
+|              2 | Albacete      |            0 |
+|              3 | Alacant       |            0 |
+|              4 | Almeria       |            0 |
+|              5 | Àvila         |            0 |
++----------------+---------------+--------------+
+5 rows in set (0,00 sec)
+
+ACTIVITAT 4:
+
+La imatge del MySQL Workbench te l'adjunto també.
+
+ACTIVITAT 5:
+
+- 4 consultes unitaula:
+
+1. Selecciona 10 habitatges amb la superfície major a 100 metres quadrats. 
+
+mysql:[root:habitatge]> SELECT id_habitatge, superfície_jardí FROM casa WHERE superfície_jardí > 100 ORDER BY id_habitatge DESC LIMIT 10;
++--------------+--------------------+
+| id_habitatge | superfície_jardí   |
++--------------+--------------------+
+|     85073788 |            1759.20 |
+|     85058228 |             127.60 |
+|     85024119 |             115.00 |
+|     84983290 |          102000.00 |
+|     84953982 |             172.00 |
+|     84946676 |             113.60 |
+|     84857416 |           26000.00 |
+|     84855516 |             120.00 |
+|     84797970 |             255.20 |
+|     84774526 |             809.00 |
++--------------+--------------------+
+10 rows in set (0,00 sec)
+
+2. Selecciona 10 pisos que siguin de tipus "Loft".
+
+mysql:[root:habitatge]> SELECT * FROM pis WHERE tipus_pis = 'Loft' LIMIT 10;
++--------+--------------+-----------+
+| id_pis | id_habitatge | tipus_pis |
++--------+--------------+-----------+
+|      1 |     84689154 | Loft      |
+|     10 |     31833729 | Loft      |
+|     13 |      1589965 | Loft      |
+|     26 |      1812711 | Loft      |
+|     43 |     38313690 | Loft      |
+|     51 |     83098321 | Loft      |
+|     55 |     84532289 | Loft      |
+|     59 |     37444082 | Loft      |
+|     77 |     37737655 | Loft      |
+|     81 |     37723542 | Loft      |
++--------+--------------+-----------+
+10 rows in set (0,00 sec)
+
+
+3. Selecciona 5 habitatges que tinguin tant aire acondicionat i ascensor.
+
+mysql:[root:habitatge]> SELECT id_habitatge, aire_condicionat, ascensor FROM característiques WHERE aire_condicionat = TRUE AND ascensor = TRUE LIMIT 5;
++--------------+------------------+----------+
+| id_habitatge | aire_condicionat | ascensor |
++--------------+------------------+----------+
+|     37945359 |                1 |        1 |
+|      1589965 |                1 |        1 |
+|     37839801 |                1 |        1 |
+|      1812711 |                1 |        1 |
+|      1845905 |                1 |        1 |
++--------------+------------------+----------+
+5 rows in set (0,00 sec)
+
+
+4. Selecciona, de forma aleatoria, els habitatges que estiguin disponibles per lloguar.
+
+mysql:[root:habitatge]> SELECT id_habitatge, disponibilitat_lloguer FROM habitatges_general WHERE disponibilitat_lloguer = TRUE ORDER BY RAND() LIMIT 10;
++--------------+------------------------+
+| id_habitatge | disponibilitat_lloguer |
++--------------+------------------------+
+|     40568305 |                      1 |
+|     30502750 |                      1 |
+|     37021398 |                      1 |
+|     84231404 |                      1 |
+|     85059995 |                      1 |
+|     29958063 |                      1 |
+|     82813138 |                      1 |
+|     39390557 |                      1 |
+|     82589371 |                      1 |
+|     26049172 |                      1 |
++--------------+------------------------+
+10 rows in set (0,00 sec)
+
+
+- 3 consultes multi-taula:
+
+1. Mostra les dades de les primeres 5 cases (no pisos) amb les característiques i ubicacions.
+
+mysql:[root:habitatge]> SELECT c.id_casa, h.superfície_habitatge, h.superfície_terrasa, c.tipus_casa, m.nom_municipi FROM casa c INNER JOIN habitatges_general h ON c.id_habitatge = h.id_habitatge INNER JOIN habitatge_municipi hm ON h.id_habitatge = hm.id_habitatge INNER JOIN municipis m ON hm.codi_municipi = m.codi_municipi LIMIT 5;
++---------+-----------------------+---------------------+------------+-------------------------+
+| id_casa | superfície_habitatge  | superfície_terrasa  | tipus_casa | nom_municipi            |
++---------+-----------------------+---------------------+------------+-------------------------+
+|       1 |                351.00 |               35.10 | Aïllada    | Torrelavit              |
+|       2 |                401.00 |               40.10 | Masia      | Vilafranca del Penedès  |
+|       3 |               2200.00 |              220.00 | Adosada    | Gelida                  |
+|       4 |                480.00 |               48.00 | Aïllada    | Subirats                |
+|       5 |                750.00 |               75.00 | Masia      | Olèrdola                |
++---------+-----------------------+---------------------+------------+-------------------------+
+5 rows in set (0,00 sec)
+
+2. Obtén els 10 noms dels municipis amb el nom de habitatgees disponibles per lloguer en cadascú d'ells, ordenats de major a menor.
+
+mysql:[root:habitatge]> SELECT m.nom_municipi, COUNT(*) AS num_habs_disponibles FROM habitatges_general hg INNER JOIN habitatge_municipi hm ON hg.id_habitatge = hm.id_habitatge INNER JOIN municipis m ON hm.codi_municipi = m.codi_municipi WHERE hg.disponibilitat_lloguer = 1 GROUP BY m.nom_municipi ORDER BY num_habs_disponibles DESC LIMIT 10;
++------------------------------+----------------------+
+| nom_municipi                 | num_habs_disponibles |
++------------------------------+----------------------+
+| Roses                        |                  537 |
+| Ripoll                       |                   91 |
+| Vilafranca del Penedès       |                   90 |
+| Camprodon                    |                   47 |
+| Torrelles de Foix            |                   41 |
+| Santa Margarida i els Monjos |                   31 |
+| Ribes de Freser              |                   31 |
+| Sant Sadurní d'Anoia         |                   31 |
+| Sant Quintí de Mediona       |                   30 |
+| Gelida                       |                   29 |
++------------------------------+----------------------+
+10 rows in set (0,00 sec)
+
+3. Obtén de forma aleatòria el nom de 5 municipis junt a la seva provincia.
+
+mysql:[root:habitatge]> SELECT m.nom_municipi, p.nom_provincia FROM municipis m INNER JOIN provincies p ON m.codi_provincia = p.codi_provincia ORDER BY RAND() LIMIT 5;
++-------------------------+---------------+
+| nom_municipi            | nom_provincia |
++-------------------------+---------------+
+| Torre de Arcas          | Terol         |
+| Valencia de las Torres  | Badajoz       |
+| Vilajuïga               | Girona        |
+| Villaciervos            | Sòria         |
+| Santa Coloma de Farners | Girona        |
++-------------------------+---------------+
+5 rows in set (0,00 sec)
+
+- 2 subconsultes:
+
+1. Troba les dades energètiques de les últimes 7 cases disponibles per adquilar.
+
+mysql:[root:habitatge]> SELECT * FROM energia e WHERE id_habitatge IN (
+    ->     SELECT id_habitatge
+    ->     FROM habitatges_general
+    ->     WHERE disponibilitat_lloguer = 1
+    -> )
+    -> ORDER BY id_habitatge DESC
+    -> LIMIT 7;
++--------------+-----------------------+-------------------+------------------------+
+| id_habitatge | certificat_energètic  | consum_energètic  | emissons_energètiques  |
++--------------+-----------------------+-------------------+------------------------+
+|     85073788 | E                     |            280.00 |                 192.00 |
+|     85060059 | B                     |            247.00 |                 303.00 |
+|     85059997 | B                     |            565.00 |                 187.00 |
+|     85059995 | D                     |            626.00 |                 411.00 |
+|     85058228 | B                     |            613.00 |                 219.00 |
+|     85024119 | E                     |            353.00 |                 289.00 |
+|     85010817 | D                     |             68.00 |                 395.00 |
++--------------+-----------------------+-------------------+------------------------+
+7 rows in set (0,00 sec)
+
+2. Troba els noms dels municipis on el nombre de cases en venda és igual al nombre de cases de lloguer.
+
+mysql:[root:habitatge]> SELECT nom_municipi FROM municipis WHERE codi_municipi IN (
+    ->     SELECT hm.codi_municipi
+    ->     FROM habitatge_municipi hm
+    ->     INNER JOIN habitatges_general hg ON hm.id_habitatge = hg.id_habitatge
+    ->     GROUP BY hm.codi_municipi
+    ->     HAVING COUNT(CASE WHEN hg.disponibilitat_lloguer = 0 THEN 1 END) = COUNT(CASE WHEN hg.disponibilitat_lloguer = 1 THEN 1 END)
+    -> );
++---------------------+
+| nom_municipi        |
++---------------------+
+| Pacs del Penedès    |
+| Sant Martí Sarroca  |
++---------------------+
+2 rows in set (0,00 sec)
