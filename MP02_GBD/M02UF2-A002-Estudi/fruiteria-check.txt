@@ -1,0 +1,230 @@
+mysql:[root:fruiteria]> show tables;
++---------------------+
+| Tables_in_fruiteria |
++---------------------+
+| categories          |
+| compres             |
+| majoristes          |
+| municipis           |
+| productes           |
+| productes_i_compres |
+| provincies          |
+| vendes              |
++---------------------+
+8 rows in set (0,01 sec)
+
+mysql:[root:fruiteria]> desc categories;
++---------------+--------------------------+------+-----+---------+----------------+
+| Field         | Type                     | Null | Key | Default | Extra          |
++---------------+--------------------------+------+-----+---------+----------------+
+| id_categoria  | int(2) unsigned zerofill | NO   | PRI | NULL    | auto_increment |
+| nom_categoria | varchar(30)              | YES  |     | NULL    |                |
++---------------+--------------------------+------+-----+---------+----------------+
+2 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> desc compres;
++--------------+--------------------------+------+-----+---------+----------------+
+| Field        | Type                     | Null | Key | Default | Extra          |
++--------------+--------------------------+------+-----+---------+----------------+
+| id_compra    | int(3) unsigned zerofill | NO   | PRI | NULL    | auto_increment |
+| data_compra  | date                     | YES  |     | NULL    |                |
+| id_majorista | int(3) unsigned zerofill | YES  | MUL | NULL    |                |
++--------------+--------------------------+------+-----+---------+----------------+
+3 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> desc majoristes;
++--------------------+--------------------------+------+-----+---------+----------------+
+| Field              | Type                     | Null | Key | Default | Extra          |
++--------------------+--------------------------+------+-----+---------+----------------+
+| id_majorista       | int(4) unsigned zerofill | NO   | PRI | NULL    | auto_increment |
+| nom_empresa        | varchar(50)              | YES  |     | NULL    |                |
+| persona_empresa    | varchar(50)              | YES  |     | NULL    |                |
+| id_municipi        | int(4) unsigned zerofill | YES  | MUL | NULL    |                |
+| id_provincia       | int(4) unsigned zerofill | YES  |     | NULL    |                |
+| adreça             | varchar(50)              | YES  |     | NULL    |                |
+| telèfon            | int                      | YES  |     | NULL    |                |
+| correu_electrònic  | varchar(70)              | YES  |     | NULL    |                |
++--------------------+--------------------------+------+-----+---------+----------------+
+8 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> ^C
+mysql:[root:fruiteria]> desc municipis;
++--------------+--------------------------+------+-----+---------+----------------+
+| Field        | Type                     | Null | Key | Default | Extra          |
++--------------+--------------------------+------+-----+---------+----------------+
+| id_municipi  | int(4) unsigned zerofill | NO   | PRI | NULL    | auto_increment |
+| nom_municipi | varchar(50)              | YES  |     | NULL    |                |
+| id_provincia | int(4) unsigned zerofill | YES  | MUL | NULL    |                |
++--------------+--------------------------+------+-----+---------+----------------+
+3 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> desc productes;
++--------------+--------------------------------+------+-----+---------+----------------+
+| Field        | Type                           | Null | Key | Default | Extra          |
++--------------+--------------------------------+------+-----+---------+----------------+
+| id_producte  | int(2) unsigned zerofill       | NO   | PRI | NULL    | auto_increment |
+| nom_producte | varchar(50)                    | YES  |     | NULL    |                |
+| preu         | decimal(10,2)                  | YES  |     | NULL    |                |
+| stock        | int                            | YES  |     | NULL    |                |
+| temporada    | enum('Hivern','Estiu','Anual') | YES  |     | NULL    |                |
+| id_categoria | int(2) unsigned zerofill       | YES  | MUL | NULL    |                |
++--------------+--------------------------------+------+-----+---------+----------------+
+6 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> desc productes_i_compres;
++-------------+--------------------------+------+-----+---------+-------+
+| Field       | Type                     | Null | Key | Default | Extra |
++-------------+--------------------------+------+-----+---------+-------+
+| id_compra   | int(3) unsigned zerofill | NO   | PRI | NULL    |       |
+| id_producte | int(2) unsigned zerofill | NO   | PRI | NULL    |       |
+| quantitat   | int                      | YES  |     | NULL    |       |
+| preu_total  | decimal(10,2)            | YES  |     | NULL    |       |
++-------------+--------------------------+------+-----+---------+-------+
+4 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> desc provincies;
++---------------+--------------------------+------+-----+---------+----------------+
+| Field         | Type                     | Null | Key | Default | Extra          |
++---------------+--------------------------+------+-----+---------+----------------+
+| id_provincia  | int(4) unsigned zerofill | NO   | PRI | NULL    | auto_increment |
+| nom_provincia | varchar(50)              | YES  |     | NULL    |                |
++---------------+--------------------------+------+-----+---------+----------------+
+2 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> desc vendes;
++---------------+--------------------------+------+-----+---------+----------------+
+| Field         | Type                     | Null | Key | Default | Extra          |
++---------------+--------------------------+------+-----+---------+----------------+
+| numero_ticket | int(8) unsigned zerofill | NO   | PRI | NULL    | auto_increment |
+| id_majorista  | int(4) unsigned zerofill | YES  | MUL | NULL    |                |
+| dia           | date                     | YES  |     | NULL    |                |
+| hora          | time                     | YES  |     | NULL    |                |
+| preu          | decimal(10,2)            | YES  |     | NULL    |                |
++---------------+--------------------------+------+-----+---------+----------------+
+5 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> SELECT * FROM categories;
++--------------+------------------------+
+| id_categoria | nom_categoria          |
++--------------+------------------------+
+|           01 | fruites                |
+|           02 | verdures               |
+|           03 | fruits secs            |
+|           04 | edulcorants            |
+|           05 | cereals                |
+|           06 | llegums                |
+|           07 | ous                    |
+|           08 | begudes                |
+|           09 | olis                   |
+|           10 | salses                 |
+|           11 | condiments alimentaris |
++--------------+------------------------+
+11 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> SELECT * FROM compres;
++-----------+-------------+--------------+
+| id_compra | data_compra | id_majorista |
++-----------+-------------+--------------+
+|       001 | 2024-04-12  |          003 |
+|       002 | 2023-05-19  |          001 |
+|       003 | 2023-09-23  |          002 |
+|       004 | 2024-03-03  |          006 |
+|       005 | 2023-05-06  |          004 |
+|       006 | 2023-11-18  |          005 |
+|       007 | 2024-01-15  |          007 |
++-----------+-------------+--------------+
+7 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> SELECT * FROM majoristes;
++--------------+-------------------------+-------------------+-------------+--------------+--------------------------------+-----------+-------------------------------+
+| id_majorista | nom_empresa             | persona_empresa   | id_municipi | id_provincia | adreça                         | telèfon   | correu_electrònic             |
++--------------+-------------------------+-------------------+-------------+--------------+--------------------------------+-----------+-------------------------------+
+|         0001 | Mariscos Recio          | Antonio Recio     |        1257 |         0005 | Calle Mirador de Montepinar 7  | 612435657 | arecio@mariscosrecio.es       |
+|         0002 | Frutería Cuestista      | Juan Cuesta       |        1277 |         0028 | Calle Desengaño 21             | 623445875 | jcuesta@fruteriacuestista.com |
+|         0003 | Supermercado barato 123 | Arataki Itto      |        0540 |         0003 | Carretera de Inazuma 69        | 784123834 | aitto@arataki.cat             |
+|         0004 | Drinks with Fidelito    | Fidel Martínez    |        2083 |         0009 | Calle de los Miedos Sagrados 3 | 623134674 | fmartinez@drinksfidelito.es   |
+|         0005 | Los Mercados Lápida     | Elvira Lápida     |        2209 |         0044 | Plaza de Vista Gentil          | 601234987 | elapida@lapida.com            |
+|         0006 | El Bar de Moe           | Moe Szyslak       |        1737 |         0026 | Calle de Springfield 21        | 740433424 | mszyslak@barmoe.es            |
+|         0007 | LeBlanc                 | Ren Amamiya Joker |        3147 |         0037 | Avenida de Yongen-Jaya         | 534555234 | ramamiya@leblanc.com          |
++--------------+-------------------------+-------------------+-------------+--------------+--------------------------------+-----------+-------------------------------+
+7 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> SELECT * FROM municipis LIMIT 10;
++-------------+-----------------------+--------------+
+| id_municipi | nom_municipi          | id_provincia |
++-------------+-----------------------+--------------+
+|        0010 | Abla                  |         0004 |
+|        0011 | Abajas                |         0009 |
+|        0012 | Alaró                 |         0007 |
+|        0013 | Adanero               |         0005 |
+|        0014 | Alegría-Dulantzi      |         0001 |
+|        0015 | Atzúbia, l'           |         0003 |
+|        0016 | Acedera               |         0006 |
+|        0017 | Atzeneta del Maestrat |         0012 |
+|        0018 | Abrera                |         0008 |
+|        0019 | Abengibre             |         0002 |
++-------------+-----------------------+--------------+
+10 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> SELECT * FROM productes;
++-------------+----------------+------+-------+-----------+--------------+
+| id_producte | nom_producte   | preu | stock | temporada | id_categoria |
++-------------+----------------+------+-------+-----------+--------------+
+|          01 | poma           | 1.50 |   100 | Estiu     |           01 |
+|          02 | enciam         | 1.00 |    55 | Estiu     |           02 |
+|          03 | nous           | 3.00 |    80 | Anual     |           03 |
+|          04 | sucre          | 2.50 |   120 | Anual     |           04 |
+|          05 | cereals        | 3.00 |    56 | Anual     |           05 |
+|          06 | llenties       | 1.40 |    34 | Hivern    |           06 |
+|          07 | ous de gallina | 1.00 |   150 | Anual     |           07 |
+|          08 | Coca-Cola      | 2.50 |   100 | Anual     |           08 |
+|          09 | oli oliva      | 6.00 |    12 | Anual     |           09 |
+|          10 | salsa barbacoa | 4.50 |    34 | Anual     |           10 |
+|          11 | sal            | 0.50 |   123 | Anual     |           11 |
++-------------+----------------+------+-------+-----------+--------------+
+11 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> SELECT * FROM productes_i_compres;
++-----------+-------------+-----------+------------+
+| id_compra | id_producte | quantitat | preu_total |
++-----------+-------------+-----------+------------+
+|       001 |          01 |        12 |      18.00 |
+|       002 |          04 |        23 |      57.50 |
+|       003 |          05 |        34 |     102.00 |
+|       004 |          03 |         5 |      15.00 |
+|       005 |          07 |        12 |      12.00 |
+|       006 |          11 |       100 |      50.00 |
+|       007 |          10 |        33 |     148.50 |
++-----------+-------------+-----------+------------+
+7 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> SELECT * FROM provincies LIMIT 10;
++--------------+---------------+
+| id_provincia | nom_provincia |
++--------------+---------------+
+|         0001 | Àlaba         |
+|         0002 | Albacete      |
+|         0003 | Alacant       |
+|         0004 | Almeria       |
+|         0005 | Àvila         |
+|         0006 | Badajoz       |
+|         0007 | Illes Balears |
+|         0008 | Barcelona     |
+|         0009 | Burgos        |
+|         0010 | Càceres       |
++--------------+---------------+
+10 rows in set (0,00 sec)
+
+mysql:[root:fruiteria]> SELECT * FROM vendes;
++---------------+--------------+------------+----------+--------+
+| numero_ticket | id_majorista | dia        | hora     | preu   |
++---------------+--------------+------------+----------+--------+
+|      00000001 |         0006 | 2024-04-29 | 21:24:51 | 988.07 |
+|      00000002 |         0003 | 2024-04-29 | 21:24:51 | 623.27 |
+|      00000003 |         0007 | 2024-04-29 | 21:24:51 | 944.10 |
+|      00000004 |         0005 | 2024-04-29 | 21:24:51 | 988.56 |
+|      00000005 |         0002 | 2024-04-29 | 21:24:51 |  63.23 |
+|      00000006 |         0001 | 2024-04-29 | 21:24:51 | 245.93 |
+|      00000007 |         0004 | 2024-04-29 | 21:24:51 | 204.27 |
++---------------+--------------+------------+----------+--------+
+7 rows in set (0,00 sec)
